@@ -1,0 +1,799 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+<meta charset="utf-8" />
+<meta name="generator" content="pandoc" />
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
+
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+
+<meta name="author" content="Ryo Okui (okuiryo@e.u-tokyo.ac.jp), Takahide Yanagi (yanagi@econ.kyoto-u.ac.jp), Heejun Lee (info.hlee@gmail.com)" />
+
+
+<title>Getting Started with the panelhetero Package</title>
+
+<script>// Pandoc 2.9 adds attributes on both header and div. We remove the former (to
+// be compatible with the behavior of Pandoc < 2.8).
+document.addEventListener('DOMContentLoaded', function(e) {
+  var hs = document.querySelectorAll("div.section[class*='level'] > :first-child");
+  var i, h, a;
+  for (i = 0; i < hs.length; i++) {
+    h = hs[i];
+    if (!/^h[1-6]$/i.test(h.tagName)) continue;  // it should be a header h1-h6
+    a = h.attributes;
+    while (a.length > 0) h.removeAttribute(a[0].name);
+  }
+});
+</script>
+
+<style type="text/css">
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+span.underline{text-decoration: underline;}
+div.column{display: inline-block; vertical-align: top; width: 50%;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+</style>
+
+
+
+<style type="text/css">
+code {
+white-space: pre;
+}
+.sourceCode {
+overflow: visible;
+}
+</style>
+<style type="text/css" data-origin="pandoc">
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+{ counter-reset: source-line 0; }
+pre.numberSource code > span
+{ position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+{ content: counter(source-line);
+position: relative; left: -1em; text-align: right; vertical-align: baseline;
+border: none; display: inline-block;
+-webkit-touch-callout: none; -webkit-user-select: none;
+-khtml-user-select: none; -moz-user-select: none;
+-ms-user-select: none; user-select: none;
+padding: 0 4px; width: 4em;
+color: #aaaaaa;
+}
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa; padding-left: 4px; }
+div.sourceCode
+{ }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } 
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } 
+code span.at { color: #7d9029; } 
+code span.bn { color: #40a070; } 
+code span.bu { color: #008000; } 
+code span.cf { color: #007020; font-weight: bold; } 
+code span.ch { color: #4070a0; } 
+code span.cn { color: #880000; } 
+code span.co { color: #60a0b0; font-style: italic; } 
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } 
+code span.do { color: #ba2121; font-style: italic; } 
+code span.dt { color: #902000; } 
+code span.dv { color: #40a070; } 
+code span.er { color: #ff0000; font-weight: bold; } 
+code span.ex { } 
+code span.fl { color: #40a070; } 
+code span.fu { color: #06287e; } 
+code span.im { color: #008000; font-weight: bold; } 
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } 
+code span.kw { color: #007020; font-weight: bold; } 
+code span.op { color: #666666; } 
+code span.ot { color: #007020; } 
+code span.pp { color: #bc7a00; } 
+code span.sc { color: #4070a0; } 
+code span.ss { color: #bb6688; } 
+code span.st { color: #4070a0; } 
+code span.va { color: #19177c; } 
+code span.vs { color: #4070a0; } 
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } 
+</style>
+<script>
+// apply pandoc div.sourceCode style to pre.sourceCode instead
+(function() {
+  var sheets = document.styleSheets;
+  for (var i = 0; i < sheets.length; i++) {
+    if (sheets[i].ownerNode.dataset["origin"] !== "pandoc") continue;
+    try { var rules = sheets[i].cssRules; } catch (e) { continue; }
+    var j = 0;
+    while (j < rules.length) {
+      var rule = rules[j];
+      // check if there is a div.sourceCode rule
+      if (rule.type !== rule.STYLE_RULE || rule.selectorText !== "div.sourceCode") {
+        j++;
+        continue;
+      }
+      var style = rule.style.cssText;
+      // check if color or background-color is set
+      if (rule.style.color === '' && rule.style.backgroundColor === '') {
+        j++;
+        continue;
+      }
+      // replace div.sourceCode by a pre.sourceCode rule
+      sheets[i].deleteRule(j);
+      sheets[i].insertRule('pre.sourceCode{' + style + '}', j);
+    }
+  }
+})();
+</script>
+
+
+
+
+<style type="text/css">body {
+background-color: #fff;
+margin: 1em auto;
+max-width: 700px;
+overflow: visible;
+padding-left: 2em;
+padding-right: 2em;
+font-family: "Open Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
+font-size: 14px;
+line-height: 1.35;
+}
+#TOC {
+clear: both;
+margin: 0 0 10px 10px;
+padding: 4px;
+width: 400px;
+border: 1px solid #CCCCCC;
+border-radius: 5px;
+background-color: #f6f6f6;
+font-size: 13px;
+line-height: 1.3;
+}
+#TOC .toctitle {
+font-weight: bold;
+font-size: 15px;
+margin-left: 5px;
+}
+#TOC ul {
+padding-left: 40px;
+margin-left: -1.5em;
+margin-top: 5px;
+margin-bottom: 5px;
+}
+#TOC ul ul {
+margin-left: -2em;
+}
+#TOC li {
+line-height: 16px;
+}
+table {
+margin: 1em auto;
+border-width: 1px;
+border-color: #DDDDDD;
+border-style: outset;
+border-collapse: collapse;
+}
+table th {
+border-width: 2px;
+padding: 5px;
+border-style: inset;
+}
+table td {
+border-width: 1px;
+border-style: inset;
+line-height: 18px;
+padding: 5px 5px;
+}
+table, table th, table td {
+border-left-style: none;
+border-right-style: none;
+}
+table thead, table tr.even {
+background-color: #f7f7f7;
+}
+p {
+margin: 0.5em 0;
+}
+blockquote {
+background-color: #f6f6f6;
+padding: 0.25em 0.75em;
+}
+hr {
+border-style: solid;
+border: none;
+border-top: 1px solid #777;
+margin: 28px 0;
+}
+dl {
+margin-left: 0;
+}
+dl dd {
+margin-bottom: 13px;
+margin-left: 13px;
+}
+dl dt {
+font-weight: bold;
+}
+ul {
+margin-top: 0;
+}
+ul li {
+list-style: circle outside;
+}
+ul ul {
+margin-bottom: 0;
+}
+pre, code {
+background-color: #f7f7f7;
+border-radius: 3px;
+color: #333;
+white-space: pre-wrap; 
+}
+pre {
+border-radius: 3px;
+margin: 5px 0px 10px 0px;
+padding: 10px;
+}
+pre:not([class]) {
+background-color: #f7f7f7;
+}
+code {
+font-family: Consolas, Monaco, 'Courier New', monospace;
+font-size: 85%;
+}
+p > code, li > code {
+padding: 2px 0px;
+}
+div.figure {
+text-align: center;
+}
+img {
+background-color: #FFFFFF;
+padding: 2px;
+border: 1px solid #DDDDDD;
+border-radius: 3px;
+border: 1px solid #CCCCCC;
+margin: 0 5px;
+}
+h1 {
+margin-top: 0;
+font-size: 35px;
+line-height: 40px;
+}
+h2 {
+border-bottom: 4px solid #f7f7f7;
+padding-top: 10px;
+padding-bottom: 2px;
+font-size: 145%;
+}
+h3 {
+border-bottom: 2px solid #f7f7f7;
+padding-top: 10px;
+font-size: 120%;
+}
+h4 {
+border-bottom: 1px solid #f7f7f7;
+margin-left: 8px;
+font-size: 105%;
+}
+h5, h6 {
+border-bottom: 1px solid #ccc;
+font-size: 105%;
+}
+a {
+color: #0033dd;
+text-decoration: none;
+}
+a:hover {
+color: #6666ff; }
+a:visited {
+color: #800080; }
+a:visited:hover {
+color: #BB00BB; }
+a[href^="http:"] {
+text-decoration: underline; }
+a[href^="https:"] {
+text-decoration: underline; }
+
+code > span.kw { color: #555; font-weight: bold; } 
+code > span.dt { color: #902000; } 
+code > span.dv { color: #40a070; } 
+code > span.bn { color: #d14; } 
+code > span.fl { color: #d14; } 
+code > span.ch { color: #d14; } 
+code > span.st { color: #d14; } 
+code > span.co { color: #888888; font-style: italic; } 
+code > span.ot { color: #007020; } 
+code > span.al { color: #ff0000; font-weight: bold; } 
+code > span.fu { color: #900; font-weight: bold; } 
+code > span.er { color: #a61717; background-color: #e3d2d2; } 
+</style>
+
+
+
+
+</head>
+
+<body>
+
+
+
+
+<h1 class="title toc-ignore">Getting Started with the panelhetero
+Package</h1>
+<h4 class="author">Ryo Okui (<a href="mailto:okuiryo@e.u-tokyo.ac.jp" class="email">okuiryo@e.u-tokyo.ac.jp</a>), Takahide Yanagi (<a href="mailto:yanagi@econ.kyoto-u.ac.jp" class="email">yanagi@econ.kyoto-u.ac.jp</a>), Heejun Lee (<a href="mailto:info.hlee@gmail.com" class="email">info.hlee@gmail.com</a>)</h4>
+<h4 class="date">April 2023</h4>
+
+
+
+<p>This vignette discusses how to use the <strong>panelhetero</strong>
+package.</p>
+<p>The package enables to estimate the degree of heterogeneity across
+cross-sectional units in the panel data analysis. The methods are
+developed by the following papers:</p>
+<ul>
+<li><a href="https://doi.org/10.1016/j.jeconom.2019.04.036">Okui and
+Yanagi (2019) “Panel data analysis with heterogeneous dynamics”</a></li>
+<li><a href="https://doi.org/10.1093/ectj/utz019">Okui and Yanagi (2020)
+“Kernel estimation for panel data with heterogeneous dynamics”</a></li>
+</ul>
+<div id="setup" class="section level1">
+<h1>Setup</h1>
+<p>Suppose that we have balanced panel data <span class="math inline">\(\{ y_{it} \}\)</span> for <span class="math inline">\(i = 1, \dots, N\)</span> and <span class="math inline">\(t = 1, \dots, T\)</span>. Here:</p>
+<ul>
+<li><span class="math inline">\(y_{it}\)</span>: A scalar random
+variable for unit <span class="math inline">\(i\)</span> in period <span class="math inline">\(t\)</span>.</li>
+<li><span class="math inline">\(N\)</span>: The number of
+cross-sectional units.</li>
+<li><span class="math inline">\(T\)</span>: The length of time
+series.</li>
+</ul>
+<p>Assume that the individual time series <span class="math inline">\(\{
+y_{it} \}\)</span> for <span class="math inline">\(t = 1, \dots,
+T\)</span> is strictly stationary across time but heterogeneous across
+units.</p>
+<p>To examine the degree of heterogeneity, we focus on estimating the
+cumulative distribution function (CDF), the density function, and the
+moments (i.e., the means, the variances, and the correlations) of the
+heterogeneous mean, the <span class="math inline">\(k\)</span>-th
+autocovariance, and the <span class="math inline">\(k\)</span>-th
+autocorrelation:</p>
+<ul>
+<li><span class="math inline">\(\mu_i = E(y_{it}|i)\)</span>,</li>
+<li><span class="math inline">\(\gamma_{k,i} = E[(y_{it} -
+\mu_i)(y_{i,t-k} - \mu_i)|i]\)</span>,</li>
+<li><span class="math inline">\(\rho_{k,i} =
+\gamma_{k,i}/\gamma_{0,i}\)</span>,</li>
+</ul>
+<p>where <span class="math inline">\(E(\cdot | i)\)</span> denotes the
+population mean for the individual time series. In words, <span class="math inline">\(\mu_i\)</span>, <span class="math inline">\(\gamma_{k,i}\)</span>, and <span class="math inline">\(\rho_{k,i}\)</span> are the population mean, <span class="math inline">\(k\)</span>-th autocovariance, and <span class="math inline">\(k\)</span>-th autocorrelation, respectively, for
+the individual time series. Note that <span class="math inline">\(\gamma_{0, i}\)</span> corresponds to the
+variance. These variables are treated as random variables that are
+i.i.d. across units.</p>
+<p>The corresponding estimators are:</p>
+<ul>
+<li><span class="math inline">\(\hat \mu_i = \frac{1}{T} \sum_{t=1}^T
+y_{it}\)</span>.</li>
+<li><span class="math inline">\(\hat \gamma_{k,i} = \frac{1}{T-k}
+\sum_{t=k+1}^T (y_{it} - \hat \mu_i)(y_{i,t-k} - \hat
+\mu_i)\)</span>.</li>
+<li><span class="math inline">\(\hat \rho_{k,i} = \hat \gamma_{k,i} /
+\hat \gamma_{0,i}\)</span>.</li>
+</ul>
+<p>Denoting <span class="math inline">\(\xi_i = \mu_i\)</span>, <span class="math inline">\(\gamma_{k,i}\)</span>, or <span class="math inline">\(\rho_{k,i}\)</span>, the parameters of interest
+are:</p>
+<ul>
+<li>The CDF <span class="math inline">\(F_{\xi}(\cdot) = \Pr(\xi_i \le
+\cdot)\)</span>.</li>
+<li>The density <span class="math inline">\(f_{\xi}(\cdot)\)</span>.</li>
+<li>The mean <span class="math inline">\(E(\xi_i)\)</span>.</li>
+<li>The variance <span class="math inline">\(var(\xi_i)\)</span>.</li>
+<li>The correlations, such as <span class="math inline">\(cor(\mu_i,
+\gamma_{k,i})\)</span>.</li>
+</ul>
+<p>Okui and Yanagi (2019) propose the empirical distribution estimation
+of the CDF and the moments of the true <span class="math inline">\(\mu_i\)</span>, <span class="math inline">\(\gamma_{k,i}\)</span>, and <span class="math inline">\(\rho_{k,i}\)</span> based on the estimated <span class="math inline">\(\hat \mu_i\)</span>, <span class="math inline">\(\hat \gamma_{k,i}\)</span>, and <span class="math inline">\(\hat \rho_{k,i}\)</span>. Okui and Yanagi (2020)
+propose the nonparametric kernel smoothing estimation for the density of
+the true <span class="math inline">\(\mu_i\)</span>, <span class="math inline">\(\gamma_{k,i}\)</span>, and <span class="math inline">\(\rho_{k,i}\)</span> based on the estimated <span class="math inline">\(\hat \mu_i\)</span>, <span class="math inline">\(\hat \gamma_{k,i}\)</span>, and <span class="math inline">\(\hat \rho_{k,i}\)</span>. Since these estimators
+have asymptotic biases, the papers propose the half-panel jaccknife
+(HPJ) bias correction and the third-order jackknife (TOJ) bias
+correction. In addition, the papers also consider the cross-sectional
+boostrap procedures for performing statistical inference. The HPJ bias
+correction requires that <span class="math inline">\(T \ge 4\)</span>.
+The TOJ bias correction requires that <span class="math inline">\(T \ge
+6\)</span>.</p>
+</div>
+<div id="functions" class="section level1">
+<h1>Functions</h1>
+<p>The <strong>panelhetero</strong> package provides the following
+functions:</p>
+<ul>
+<li><code>nemoment()</code>: The naive estimation of the moments of the
+heterogeneous mean, the heterogeneous autocovariance, and the
+heterogeneous autocorrelation without bias correction</li>
+<li><code>hpjmoment()</code>: The HPJ bias-corrected estimation of the
+moments of the heterogeneous mean, the heterogeneous autocovariance, and
+the heterogeneous autocorrelation</li>
+<li><code>tojmoment()</code>: The TOJ bias-corrected estimation of the
+moments of the heterogeneous mean, the heterogeneous autocovariance, and
+the heterogeneous autocorrelation</li>
+<li><code>neecdf()</code>: The naive empirical CDF estimation without
+bias correction</li>
+<li><code>hpjecdf()</code>: The HPJ bias-corrected empirical CDF
+estimation</li>
+<li><code>tojecdf()</code>: The TOJ bias-corrected empirical CDF
+estimation</li>
+<li><code>nekd()</code>: The naive kernel density estimation without
+bias correction</li>
+<li><code>hpjkd()</code>: The HPJ bias-corrected kernel density
+estimation</li>
+<li><code>tojkd()</code>: The TOJ bias-corrected kernel density
+estimation</li>
+</ul>
+<p>Below we discuss the arguments and the returned values of each
+function.</p>
+<div id="nemoment" class="section level2">
+<h2><code>nemoment()</code></h2>
+<p>The <code>nemoment()</code> function enables to implement the naive
+estimation of the moments of the heterogeneous quantities without bias
+correction. The parameters of interest are the means, the variances, and
+the correlations:</p>
+<ul>
+<li><span class="math inline">\(E(\mu_i)\)</span></li>
+<li><span class="math inline">\(E(\gamma_{k,i})\)</span></li>
+<li><span class="math inline">\(E(\rho_{k,i})\)</span></li>
+<li><span class="math inline">\(var(\mu_i)\)</span></li>
+<li><span class="math inline">\(var(\gamma_{k,i})\)</span></li>
+<li><span class="math inline">\(var(\rho_{k,i})\)</span></li>
+<li><span class="math inline">\(cor(\mu_i, \gamma_{k,i})\)</span></li>
+<li><span class="math inline">\(cor(\mu_i, \rho_{k,i})\)</span></li>
+<li><span class="math inline">\(cor(\gamma_{k,i},
+\rho_{k,i})\)</span></li>
+</ul>
+<p>The usage is
+<code>nemoment(data, acov_order = 0, acor_order = 1, R = 1000)</code>
+with:</p>
+<ul>
+<li><code>data</code>: An <span class="math inline">\(N \times
+T\)</span> matrix of panel data. Each row corresponds to individual time
+series.</li>
+<li><code>acov_order</code>: A non-negative integer <span class="math inline">\(k\)</span> of the order of autocovariance. Default
+is 0.</li>
+<li><code>acor_order</code>: A positive integer <span class="math inline">\(k\)</span> of the order of autocorrelation.
+Default is 1.</li>
+<li><code>R</code>: A positive integer of the number of bootstrap
+repetitions. Default is 1000.</li>
+</ul>
+<p>The function returns a list that contains the following elements:</p>
+<ul>
+<li><code>estimate</code>: A vector of the parameter estimates</li>
+<li><code>se</code>: A vector of the standard errors computed by the
+cross-sectional bootstrap</li>
+<li><code>ci</code>: A matrix of the 95% confidence intervals computed
+by the cross-sectional bootstrap</li>
+<li><code>quantity</code>: A matrix of the estimated heterogeneous
+quantities</li>
+<li><code>acov_order</code>: The order of autocovariance</li>
+<li><code>acor_order</code>: The order of autocorrelation</li>
+<li><code>N</code>: The number of cross-sectional units</li>
+<li><code>S</code>: The length of time series</li>
+<li><code>R</code>: The number of bootstrap repetitions</li>
+</ul>
+<p>Note: The bootstrap results depend on random number generation. It is
+highly recommended to use <code>set.seed()</code> before
+<code>nemoment()</code>. The same comment also applies to the other
+functions.</p>
+</div>
+<div id="hpjmoment" class="section level2">
+<h2><code>hpjmoment()</code></h2>
+<p>The <code>hpjmoment()</code> function enables to implement the HPJ
+bias-corrected estimation of the moments of the heterogeneous quantities
+The parameters of interest are the same as <code>nemoment()</code>. The
+usage is
+<code>hpjmoment(data, acov_order = 0, acor_order = 1, R = 1000)</code>
+with the same arguments as <code>nemoment()</code>. The function returns
+a list that contains the same elements as <code>nemoment()</code>.</p>
+</div>
+<div id="tojmoment" class="section level2">
+<h2><code>tojmoment()</code></h2>
+<p>The <code>tpjmoment()</code> function enables to implement the TOJ
+bias-corrected estimation of the moments of the heterogeneous quantities
+The parameters of interest are the same as <code>nemoment()</code>. The
+usage is
+<code>tojmoment(data, acov_order = 0, acor_order = 1, R = 1000)</code>
+with the same arguments as <code>nemoment()</code>. The function returns
+a list that contains the same elements as <code>nemoment()</code>.</p>
+</div>
+<div id="neecdf" class="section level2">
+<h2><code>neecdf()</code></h2>
+<p>The <code>neecdf()</code> function enables to implement the naive
+empirical CDF estimation without bias correction. The parameters of
+interest are the CDF of <span class="math inline">\(\mu_i\)</span>, that
+of <span class="math inline">\(\gamma_{k,i}\)</span>, and that of <span class="math inline">\(\rho_{k,i}\)</span>.</p>
+<p>The usage is
+<code>neecdf(data, acov_order = 0, acor_order = 1, R = 1000, ci = TRUE)</code>
+with:</p>
+<ul>
+<li><code>data</code>: An <span class="math inline">\(N \times
+T\)</span> matrix of panel data. Each row corresponds to individual time
+series.</li>
+<li><code>acov_order</code>: A non-negative integer <span class="math inline">\(k\)</span> of the order of autocovariance. Default
+is 0.</li>
+<li><code>acor_order</code>: A positive integer <span class="math inline">\(k\)</span> of the order of autocorrelation.
+Default is 1.</li>
+<li><code>R</code>: A positive integer of the number of bootstrap
+repetitions. Default is 1000.</li>
+<li><code>ci</code>: A logical whether to compute the 95% confidence
+interval for the CDF. Default is TRUE.</li>
+</ul>
+<p>The function returns a list that contains the following elements:</p>
+<ul>
+<li><code>mean</code>: A plot of the estimated distribution of the
+heterogeneous mean made by <code>ggplot2::stat_function()</code></li>
+<li><code>acov</code>: A plot of the estimated distribution of the
+heterogeneous autocovariance made by
+<code>ggplot2::stat_function()</code></li>
+<li><code>acor</code>: A plot of the estimated distribution of the
+heterogeneous autocorrelation made by
+<code>ggplot2::stat_function()</code></li>
+<li><code>mean_func()</code>: A function that returns the value of the
+estimated distribution of the heterogeneous mean</li>
+<li><code>acov_func()</code>: A function that returns the value of the
+estimated distribution of the heterogeneous autocovariance</li>
+<li><code>acor_func()</code>: A function that returns the value of the
+estimated distribution of the heterogeneous autocorrelation</li>
+<li><code>mean_ci_func()</code>: A function that returns the 95%
+confidence interval for the estimated distribution of the heterogeneous
+mean</li>
+<li><code>acov_ci_func()</code>: A function that returns the 95%
+confidence interval for the estimated distribution of the heterogeneous
+autocovariance</li>
+<li><code>acor_ci_func()</code>: A function that returns the 95%
+confidence interval for the estimated distribution of the heterogeneous
+autocorrelation</li>
+<li><code>quantity</code>: A matrix of the estimated means,
+autocovariances, and autocorrelations</li>
+<li><code>acov_order</code>: The order of autocovariance</li>
+<li><code>acor_order</code>: The order of autocorrelation</li>
+<li><code>N</code>: The number of cross-sectional units</li>
+<li><code>S</code>: The length of time series</li>
+<li><code>R</code>: The number of bootstrap repetitions</li>
+</ul>
+<p>Note: In each plot, x-axis limits are set to the minimum and maximum
+of the estimated quantity.</p>
+</div>
+<div id="hpjecdf" class="section level2">
+<h2><code>hpjecdf()</code></h2>
+<p>The <code>hpjecdf()</code> function enables to implement the HPJ
+bias-corrected empirical CDF estimation. The parameters of interest are
+the same as <code>neecdf()</code>. The usage is
+<code>hpjecdf(data, acov_order = 0, acor_order = 1, R = 1000, ci = TRUE)</code>
+with the same arguments as <code>neecdf()</code>. The function returns a
+list that contains the same elements as <code>neecdf()</code>.</p>
+<p>Note 1: Due to bias correction, the HPJ bias-corrected empirical
+distribution estimator may be a non-monotonic function. To address this
+issue, the HPJ bias-corrected estimator is converted into a monotonic
+function using the <strong>Rearrangement</strong> package.</p>
+<p>Note 2: The <code>mean_func()</code>, <code>acov_func()</code>, and
+<code>acor_func()</code> functions returned by <code>hpjecdf()</code>
+are not subject to rearrangement. If desired, you can manually use the
+<strong>Rearrangement</strong> package to get a rearrangement
+estimate.</p>
+<p>Note 3: Due to bias correction, the HPJ or TOJ bias-corrected
+empirical distribution estimate may be less than 0 or greater than 1. We
+adjust the estimate to be between 0 and 1.</p>
+</div>
+<div id="tojecdf" class="section level2">
+<h2><code>tojecdf()</code></h2>
+<p>The <code>hpjecdf()</code> function enables to implement the HPJ
+bias-corrected empirical CDF estimation. The parameters of interest are
+the same as <code>neecdf()</code>. The usage is
+<code>hpjecdf(data, acov_order = 0, acor_order = 1, R = 1000, ci = TRUE)</code>
+with the same arguments as <code>neecdf()</code>. The function returns a
+list that contains the same elements as <code>neecdf()</code>.</p>
+<p>Note: The same comments about <code>hpjecdf()</code> also apply to
+<code>tojecdf()</code>.</p>
+</div>
+<div id="nekd" class="section level2">
+<h2><code>nekd()</code></h2>
+<p>The <code>nekd()</code> function enables to implement the naive
+kernel density estimation without bias correction using the Gaussian
+kernel. The parameters of the interest are the density function of <span class="math inline">\(\mu_i\)</span>, that of <span class="math inline">\(\gamma_{k,i}\)</span>, and that of <span class="math inline">\(\rho_{k,i}\)</span>.</p>
+<p>The usage is
+<code>nekd(data, acov_order = 0, acor_order = 1, mean_bw = NULL, acov_bw = NULL, acor_bw = NULL)</code>
+with:</p>
+<ul>
+<li><code>data</code>: An <span class="math inline">\(N \times
+T\)</span> matrix of panel data. Each row corresponds to individual time
+series.</li>
+<li><code>acov_order</code>: A non-negative integer <span class="math inline">\(k\)</span> of the order of autocovariance. Default
+is 0.</li>
+<li><code>acor_order</code>: A positive integer <span class="math inline">\(k\)</span> of the order of autocorrelation.
+Default is 1.</li>
+<li><code>mean_bw</code>: The bandwidth used for estimating the density
+function of the heterogeneous mean. Default is NULL, and the plug-in
+bandwidth is obtained from <code>KernSmooth::dpik()</code>.</li>
+<li><code>acov_bw</code>: The bandwidth used for estimating the density
+function of the heterogeneous autocovariance. Default is NULL, and the
+plug-in bandwidth is obtained from <code>KernSmooth::dpik()</code>.</li>
+<li><code>acor_bw</code>: The bandwidth used for estimating the density
+function of the heterogeneous autocorrelation. Default is NULL, and the
+plug-in bandwidth is obtained from <code>KernSmooth::dpik()</code>.</li>
+</ul>
+<p>The function returns a list that contains the following elements:</p>
+<ul>
+<li><code>mean</code>: A plot of the estimated density of the
+heterogeneous mean made by <code>ggplot2::stat_function()</code></li>
+<li><code>acov</code>: A plot of the estimated density of the
+heterogeneous autocovariance made by
+<code>ggplot2::stat_function()</code></li>
+<li><code>acor</code>: A plot of the estimated density of the
+heterogeneous autocorrelation made by
+<code>ggplot2::stat_function()</code></li>
+<li><code>mean_func()</code>: A function that returns the value of the
+estimated density of the heterogeneous mean</li>
+<li><code>acov_func()</code>: A function that returns the value of the
+estimated density of the heterogeneous autocovariance</li>
+<li><code>acor_func()</code>: A function that returns the value of the
+estimated density of the heterogeneous autocorrelation</li>
+<li><code>bandwidth</code>: A vector of the bandwidths</li>
+<li><code>quantity</code>: A matrix of the estimated means,
+autocovariances, and autocorrelations</li>
+<li><code>acov_order</code>: The order of autocovariance</li>
+<li><code>acor_order</code>: The order of autocorrelation</li>
+<li><code>N</code>: The number of cross-sectional units</li>
+<li><code>S</code>: The length of time series</li>
+</ul>
+<p>Note: In each plot, x-axis limits are set to the minimum and maximum
+of the estimated quantity.</p>
+</div>
+<div id="hpjkd" class="section level2">
+<h2><code>hpjkd()</code></h2>
+<p>The <code>hpjkd()</code> function enables to implement the HPJ
+bias-corrected kernel density estimation. The parameters of interest are
+the same as <code>nekd()</code>. The usage is
+<code>hpjkd(data, acov_order = 0, acor_order = 1, mean_bw = NULL, acov_bw = NULL, acor_bw = NULL)</code>
+with the same arguments as <code>nekd()</code>. The function returns a
+list that contains the same elements as <code>nekd()</code>.</p>
+<p>Note: Due to bias correction, the HPJ bias-corrected density estimate
+may be less than 0. The estimate is adjusted so that it is not less than
+0.</p>
+</div>
+<div id="tojkd" class="section level2">
+<h2><code>tojkd</code></h2>
+<p>The <code>tojkd()</code> function enables to implement the TOJ
+bias-corrected kernel density estimation. The parameters of interest are
+the same as <code>nekd()</code>. The usage is
+<code>tojkd(data, acov_order = 0, acor_order = 1, mean_bw = NULL, acov_bw = NULL, acor_bw = NULL)</code>
+with the same arguments as <code>nekd()</code>. The function returns a
+list that contains the same elements as <code>nekd()</code>.</p>
+<p>Note: The same comment about <code>hpjkd()</code> also applies to
+<code>tojkd()</code>.</p>
+</div>
+</div>
+<div id="examples" class="section level1">
+<h1>Examples</h1>
+<p>The following simple example illustrates the use of the
+<strong>panelhetero</strong> package.</p>
+<p>To begin with, install the following packages:</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="co"># install.packages(&quot;devtools&quot;) # if necessary</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="co"># install.packages(&quot;ggplot2&quot;)  # if necessary</span></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>devtools<span class="sc">::</span><span class="fu">install_github</span>(<span class="st">&quot;tkhdyanagi/panelhetero&quot;</span>, <span class="at">build_vignettes =</span> <span class="cn">TRUE</span>)</span></code></pre></div>
+<p>Then, using the <code>simulation()</code> function, generate
+artificial data from an AR(1) model with random coefficients as
+follows.</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">1</span>)</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>y <span class="ot">&lt;-</span> panelhetero<span class="sc">::</span><span class="fu">simulation</span>(<span class="at">N =</span> <span class="dv">300</span>, <span class="at">S =</span> <span class="dv">50</span>)</span></code></pre></div>
+<p>The <code>nemoment()</code>, <code>hpjmoment()</code>,
+<code>tojmoment()</code> functions enable to estimate the moments of the
+heterogeneous quantities. For example, you can implement the HPJ
+bias-corrected estimation as follows.</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">1</span>)</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>result1 <span class="ot">&lt;-</span> panelhetero<span class="sc">::</span><span class="fu">hpjmoment</span>(<span class="at">data =</span> y, <span class="at">acov_order =</span> <span class="dv">0</span>, <span class="at">acor_order =</span> <span class="dv">1</span>)</span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>result1<span class="sc">$</span>estimate</span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;         E(mean)         E(acov)         E(acor)       var(mean)       var(acov) </span></span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;      0.02708997      0.36548190      0.29990482      0.92438720      0.03719496 </span></span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;       var(acor) cor(mean, acov) cor(mean, acor) cor(acov, acor) </span></span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;      0.02660863      0.04421341     -0.08389775     -0.50469768</span></span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a>result1<span class="sc">$</span>se</span>
+<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;         E(mean)         E(acov)         E(acor)       var(mean)       var(acov) </span></span>
+<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;     0.055583349     0.011792564     0.013009467     0.081889058     0.004113548 </span></span>
+<span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;       var(acor) cor(mean, acov) cor(mean, acor) cor(acov, acor) </span></span>
+<span id="cb3-13"><a href="#cb3-13" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;     0.003935298     0.065784897     0.067862036     0.058240864</span></span>
+<span id="cb3-14"><a href="#cb3-14" aria-hidden="true" tabindex="-1"></a>result1<span class="sc">$</span>ci</span>
+<span id="cb3-15"><a href="#cb3-15" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;                 95% CI lower 95% CI upper</span></span>
+<span id="cb3-16"><a href="#cb3-16" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; E(mean)          -0.08318171   0.13752253</span></span>
+<span id="cb3-17"><a href="#cb3-17" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; E(acov)           0.34217581   0.38783124</span></span>
+<span id="cb3-18"><a href="#cb3-18" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; E(acor)           0.27323674   0.32419832</span></span>
+<span id="cb3-19"><a href="#cb3-19" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; var(mean)         0.76989358   1.09443133</span></span>
+<span id="cb3-20"><a href="#cb3-20" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; var(acov)         0.02904184   0.04549768</span></span>
+<span id="cb3-21"><a href="#cb3-21" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; var(acor)         0.01923979   0.03463775</span></span>
+<span id="cb3-22"><a href="#cb3-22" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; cor(mean, acov)  -0.08349429   0.17213130</span></span>
+<span id="cb3-23"><a href="#cb3-23" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; cor(mean, acor)  -0.21216526   0.05112957</span></span>
+<span id="cb3-24"><a href="#cb3-24" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; cor(acov, acor)  -0.61577864  -0.39102289</span></span></code></pre></div>
+<p>The <code>neecdf()</code>, <code>hpjecdf()</code>,
+<code>tojecdf()</code> functions enable to implement the empirical CDF
+estimation. For example, you can implement the HPJ bias-corrected
+empirical CDF estimation with:</p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>result2 <span class="ot">&lt;-</span> panelhetero<span class="sc">::</span><span class="fu">hpjecdf</span>(<span class="at">data =</span> y, </span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>                                <span class="at">acov_order =</span> <span class="dv">0</span>, </span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>                                <span class="at">acor_order =</span> <span class="dv">1</span>,</span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>                                <span class="at">R =</span> <span class="dv">100</span>,</span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>                                <span class="at">ci =</span> <span class="cn">FALSE</span>)</span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>result2<span class="sc">$</span>mean</span></code></pre></div>
+<p><img src="data:image/png;base64,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" /><!-- --></p>
+<p>The <code>nekd()</code>, <code>hpjkd()</code>, <code>tojkd()</code>
+functions enable to implement the kernel density estimation. For
+example, you can implement the HPJ bias-corrected kernel density
+estimation with:</p>
+<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>result3 <span class="ot">&lt;-</span> panelhetero<span class="sc">::</span><span class="fu">hpjkd</span>(<span class="at">data =</span> y, <span class="at">acov_order =</span> <span class="dv">0</span>, <span class="at">acor_order =</span> <span class="dv">1</span>)</span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>result3<span class="sc">$</span>mean</span></code></pre></div>
+<p><img src="data:image/png;base64,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" /><!-- --></p>
+<p>Each function makes this type of figure using the
+<strong>ggplot2</strong> package. You can customize it via standard
+commands for the <strong>ggplot2</strong> package. For example, we can
+customize the title and the theme as follows.</p>
+<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>result3<span class="sc">$</span>mean <span class="sc">+</span> </span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>  ggplot2<span class="sc">::</span><span class="fu">ggtitle</span>(<span class="st">&quot;&quot;</span>) <span class="sc">+</span> </span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>  ggplot2<span class="sc">::</span><span class="fu">theme_classic</span>()</span></code></pre></div>
+<p><img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAASAAAAEgCAMAAAAjXV6yAAAAn1BMVEUAAAAAADoAAGYAOpAAZrYzMzM6ADo6AGY6kNtNTU1NTW5NTY5NbqtNjshmAABmtv9uTU1uTW5uTY5ubo5ubqtuq+SOTU2OTW6OTY6Obk2OyP+QOgCQtpCQ2/+rbk2rbm6ryKur5OSr5P+2ZgC2/7a2///Ijk3I///bkDrb///kq27k////tmb/yI7/25D/5Kv//7b//8j//9v//+T///+8pdvmAAAACXBIWXMAAA7DAAAOwwHHb6hkAAAHY0lEQVR4nO2dC3PcRBCERSCATAgm4AABEojBDpeYi7H+/2/j5Hus1jmpV6uZndlzd6Uq55Smp/Vp9bBOGzUdNanGOoB3ERAQAQEREBABAREQEAEBERAQAQEREBABAREQEAEBERAQAQEREBABAREQEAEBERAQAQEREBABAREQEAEBERAQAQEREBABAREQEAEBzQf0yJASEBABAREQEAEBERAQAQEREBABAREQkGtATWO/NTwDaop2mwihXZGppmy7yRS6FXlqHvxtJP+AjAm5BdQc/VheBARUAyBTQl4BNaM/FFYVgCwJTbS+fdk+e7/7fPf6VUKFoCoA1DNZfbv7YdUS0EPd/nzdrV9c339e//BLWUAPm9gRGu+8/vF9d/vT2/7j3Zs/t7vY040IaKebZwdAq4vSx6BPmpgRShlBm0+FAX3awyGgcAxatb0uYIVmKoeA7l5fhLOY+QgyIwSvg7aDiIA0K2RaGBEiIKB6ABkRIiCgigDZEPIIaLSDBSECAqoKkAWhugAZEHIIaLJBcUK1AepKP89QHaD7Zz4KUqoQ0Hah4t+AK1boNDD4AlOrQsnf4usVnQotf5u74woVav5G9+7EK9T8CUhy2UwRkHgL5VDz7E1/MRSrULQnIOHF54uAxBvoRprt7umckVuh6k5A8hXK9qqBMswJSL5E194boMe1zxOQgjcB6VSpmROQeIW29+MBlGlNQFp1C73DbJ+btv3mukCaugCF2T79k8CHJ6YJaK/hbJ9u8MkhIJtMg9k+G21HkPJsn7oADWb7dOvzs7e4Qi+LXuUC63gEhU8EtFN8DOqu9pM1PAIyCRVm+wx3NgIKCrN9Vm3r+xjkKpRaliXGBKRaLGvsKIpUsayxoyhSxbLGjqJIFcsaa0VZ6Osnlp8kkuWCvn6SSJYL+vpJIlku6OsniWy9mK2bINIGUrZugkgbSNm6CSJtIGXrJoi8g4wrAYlXFHL1EsxLDh0PAVMCEq8o5XrKgGRMNaIRkLinY0Aa2QhI3NLHONb1WWRJQOVDyHnKhyMgcUcXw1jfKd+RgIpnkLQUT0dA4oYeRnEZr0xD34DE4xGQuB8BFU4gbFgQUJjMsj5vFd/MImxYzC5MZukfAV5/r/YYcK2AwoPkNz0mtQfJnfuN2x2biqAxmcX5iBx3i56v7x+7V+lfMaDhCLp9eeDj/JAh7phyDNqcxV6Ff3cPqNR1VZjMEvFxftki7gmvgzaDaPvyI52zWM2ASrR3/SVSppfr35zkXU8SkO0dONe3t+R9CUjcyvMNZAVnAhJ38vwlloI3AYkbOf4eXcPcDpAqH8uYQp2V+VQPSJuP4YYkoBKN9fnUDagAH7uhTkD6fYvwMTsYEJB620J8rI4GBKTdtRgfo8PB0qYF+dgMdwLS7VmUj8kBoS5ABgN+WcfSfAhIu2NhQOX5lN+iBKTYz4JP8U1KQHrtbPiU3qYEpNfNClDZzPnNzPgQkGLricow22f43pH8XoZ8VACF2T79y30E3u1jCUgj9eBJ+6uzPyofQRqpo9k+O1JLZvuY8slvP14XzfYROAadHKBjI2hBJ2M+CoCiV9fUD0g+d5jt0wkAMuejsGHDq2tOAlCx4Fl9HPAhIKhCyXPauOBDQFBlomd0ccKHgKCKZDd4YEZMPgH54eN0PBCQdAdNFdi8BCRb4YtPie1bOSD9/PMq3PFxBsgfH/0tXD0g7TWYU+GSjyNAPvlob+P0Cq98Nsk0VyK5wi+fTnUtUitc89FcjcQK53wU1yOpYsZObqa0iDqAKsDTpW5qDds6+KSNcwVANexee+Gs4oBqwtML5ZUF1NSGp9d0ZklANdK511RwOUDV4uk1Hl4KUNV4ejXN8eODDKDq8ex0ZDUkAJ0KnqNaDuik8SwHdOJ4FgKq8rJnpibWMExmGU5rqeYXLSGNr26YzDKc1kJAB4UHyaNHyglorzAVIXzSeHWNc42vbpjMEk1r4Qja69gImq44SfEYBDR1Frs4nMUueBY7ojCZhddBsyp6PW1SlLSUoJVow2xA93qKF0ldStBKoyEBgaUICCz1yA6580VAQAQEREBABASUB+imHfx3MKOK3qE9sdgLZBVdyS9ySsw0WL8sQH2Q8MvZmOJ3aE+EQazjO5pLnBIzDdcvexfDWyt+h/aYov9657jiuwlLnBIz9do3zAaUskm7wW0kHGV8geh+1BKn5Ezd0hG0Pj9L6TJ4h/aEF1qt+I7mEqf0TIf1mw3oqm3v2U4n3i41fIf2uFXZEQQyheV2DfNP83hPjt8RPb6Y0DEo8SyWlKk7rF8WoLQxn5oFrlZ8R3OJU2Km4frljaBV2+JjUPwO7XGVvA5KzDRYP15JAxEQEAEBERAQAQEREBABAREQEAEB+Qf07rPfu4/Pv7Zq7x9Qd/lF/8dKFQD698vfvvrbrHsFgLp3zXd2zWsAdNnY7WE1APrw5K/ndkPIP6CPGzofnpgdhPwDuvz8n+6/X812Mv+AjEVAQAQEREBABAREQEAEBERAQAQEREBA/wMOv9/Oiwd9SAAAAABJRU5ErkJggg==" /><!-- --></p>
+<p>The <code>neecdf()</code>, <code>hpjecdf()</code>,
+<code>tojecdf()</code>, <code>nekd()</code>, <code>hpjkd()</code>, and
+<code>tojkd()</code> functions return the <code>mean_func()</code>,
+<code>acov_func()</code>, and <code>acor_func()</code> functions that
+return the estimated CDFs and the estimated density functions. Using
+these functions, you can make figures by yourself. For example, you can
+make a figure of the HPJ bias-corrected density for the heterogeneous
+mean as follows.</p>
+<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>ggplot2<span class="sc">::</span><span class="fu">ggplot</span>(<span class="at">data =</span> <span class="fu">data.frame</span>(<span class="at">x =</span> <span class="fu">c</span>(<span class="sc">-</span><span class="fl">3.5</span>, <span class="fl">3.5</span>)), ggplot2<span class="sc">::</span><span class="fu">aes</span>(<span class="at">x =</span> x)) <span class="sc">+</span> </span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>  ggplot2<span class="sc">::</span><span class="fu">stat_function</span>(<span class="at">fun =</span> result3<span class="sc">$</span>mean_func) <span class="sc">+</span> </span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>  ggplot2<span class="sc">::</span><span class="fu">ggtitle</span>(<span class="st">&quot;&quot;</span>)</span></code></pre></div>
+<p><img src="data:image/png;base64,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" /><!-- --></p>
+</div>
+<div id="references" class="section level1">
+<h1>References</h1>
+<p>Ryo Okui, Takahide Yanagi (2019): <a href="https://doi.org/10.1016/j.jeconom.2019.04.036">“Panel data
+analysis with heterogeneous dynamics”, Journal of Econometrics, 212(2),
+451-475.</a></p>
+<p>Ryo Okui, Takahide Yanagi (2020): <a href="https://doi.org/10.1093/ectj/utz019">“Kernel estimation for panel
+data with heterogeneous dynamics”, The Econometrics Journal, 23(1),
+156-175.</a></p>
+</div>
+
+
+
+<!-- code folding -->
+
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>
