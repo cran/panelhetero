@@ -3,7 +3,7 @@
 
 # panelhetero: Panel Data Analysis with Heterogeneous Dynamics
 
-The **panelhetero** package provides tools for estimating the degree of
+The panelhetero package provides tools for estimating the degree of
 heterogeneity acorss cross-sectional units using panel data. The methods
 are developed by the following papers:
 
@@ -27,14 +27,9 @@ or
 devtools::install_github("tkhdyanagi/panelhetero", build_vignettes = TRUE)
 ```
 
-# Vignette
+# Website
 
-For more details, see the package vignette with:
-
-``` r
-library("panelhetero")
-vignette("panelhetero")
-```
+- <https://tkhdyanagi.github.io/panelhetero/>
 
 # References
 

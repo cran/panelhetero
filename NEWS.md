@@ -1,3 +1,7 @@
+# panelhetero 1.0.1
+
+* Changed Roxygen 2 comments, vignettes, and LICENSE.
+
 # panelhetero 1.0.0
 
 * First CRAN version.
